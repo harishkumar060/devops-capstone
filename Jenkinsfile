@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Use the exact ID you created in Jenkins
         DOCKER_HUB_CREDS = 'docker-hub-credentials'
         APP_SERVER_SSH = 'app-server-ssh'
         DOCKER_IMAGE = 'harishdockeremc/devops-capstone'
@@ -18,10 +17,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
-                    sh "docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest"
-                }
+                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+                sh "docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest"
             }
         }
 
