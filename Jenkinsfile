@@ -16,21 +16,23 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
-                sh "docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest"
-            }
-        }
+    steps {
+        // We use the absolute path /usr/bin/docker to bypass "Command Not Found"
+        sh "/usr/bin/docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+        sh "/usr/bin/docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest"
+    }
+}
 
-        stage('Push to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CREDS}", passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                    sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
-                    sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                    sh "docker push ${DOCKER_IMAGE}:latest"
-                }
-            }
+stage('Push to Docker Hub') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CREDS}", passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+            // Pointing directly to the binary here as well
+            sh "echo ${PASS} | /usr/bin/docker login -u ${USER} --password-stdin"
+            sh "/usr/bin/docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+            sh "/usr/bin/docker push ${DOCKER_IMAGE}:latest"
         }
+    }
+}
 
         stage('Deploy to App Server') {
             steps {
