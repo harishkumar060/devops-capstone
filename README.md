@@ -1,4 +1,5 @@
-DevOps Capstone: Automated Deployment & Infrastructure Monitoring
+DEVOPS CAPSTONE: AUTOMATED DEPLOYMENT & INFRASTRUCTURE MONITORING
+
 Project Overview:
 This project demonstrates a complete End-to-End DevOps Lifecycle. It automates the process of taking application source code, containerizing it with Docker, deploying it to AWS via a Jenkins CI/CD pipeline, and monitoring the infrastructure's health in real-time using Prometheus and Grafana.
 
