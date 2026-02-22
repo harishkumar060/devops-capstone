@@ -1,0 +1,12 @@
+{
+  "name": "devops-node-app",
+  "version": "1.0.0",
+  "description": "DevOps Capstone Project Node App",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
