@@ -1,7 +1,7 @@
 {
-  "name": "devops-node-app",
+  "name": "devops-capstone",
   "version": "1.0.0",
-  "description": "DevOps Capstone Project Node App",
+  "description": "NodeJS app for Capstone",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
