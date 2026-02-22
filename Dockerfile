@@ -1,18 +1,7 @@
-# Use the official Node.js image
-FROM node:18-slim
-
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install app dependencies
+FROM node:18
+WORKDIR /app
 COPY package*.json ./
 RUN npm install
-
-# Bundle app source
 COPY . .
-
-# Your app binds to port 3000
 EXPOSE 3000
-
-# Command to run the app
-CMD [ "node", "app.js" ]
+CMD ["node", "app.js"]
