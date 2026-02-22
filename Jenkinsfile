@@ -2,41 +2,47 @@ pipeline {
     agent any
 
     environment {
-        // Replace with your Docker Hub username
-        DOCKER_USER = 'your-dockerhub-username'
-        IMAGE_NAME = 'devops-capstone-app'
-        // This ID must match the Credential ID you create in Jenkins UI
-        DOCKERHUB_CRED = 'dockerhub-credentials-id'
+        // Use the exact ID you created in Jenkins
+        DOCKER_HUB_CREDS = 'docker-hub-credentials'
+        APP_SERVER_SSH = 'app-server-ssh'
+        DOCKER_IMAGE = 'harishdockeremc/devops-capstone'
+        APP_SERVER_IP = '13.201.48.204'
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                checkout scm [cite: 17]
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER} ." [cite: 21]
+                    sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+                    sh "docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest"
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CRED}", passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                    sh "echo \$PASS | docker login -u \$USER --password-stdin"
-                    sh "docker push ${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER}" [cite: 21]
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CREDS}", passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                    sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
+                    sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
                 }
             }
         }
 
-        stage('Deploy to AWS') {
+        stage('Deploy to App Server') {
             steps {
-                echo 'Deploying to App EC2 Server...' [cite: 22]
-                // We will add the specific SSH deployment command in Step 2
+                sshagent([ "${APP_SERVER_SSH}" ]) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${APP_SERVER_IP} 'docker pull ${DOCKER_IMAGE}:latest'"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${APP_SERVER_IP} 'docker stop capstone-app || true'"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${APP_SERVER_IP} 'docker rm capstone-app || true'"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${APP_SERVER_IP} 'docker run -d --name capstone-app -p 3000:3000 ${DOCKER_IMAGE}:latest'"
+                }
             }
         }
     }
